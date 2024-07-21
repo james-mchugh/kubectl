@@ -28,6 +28,13 @@ import (
 	"k8s.io/klog/v2"
 )
 
+const (
+	// ValidationStrategyClient uses client validation even if server validation is available
+	ValidationStrategyClient = "Client"
+	// ValidationStrategyServer attempts to use server validation before falling back to client validation
+	ValidationStrategyServer = "Server"
+)
+
 // Schema is an interface that knows how to validate an API object serialized to a byte array.
 type Schema interface {
 	ValidateBytes(data []byte) error
@@ -105,11 +112,12 @@ func (c ConjunctiveSchema) ValidateBytes(data []byte) error {
 	return utilerrors.NewAggregate(list)
 }
 
-func NewParamVerifyingSchema(s Schema, verifier resource.Verifier, directive string) Schema {
+func NewParamVerifyingSchema(s Schema, verifier resource.Verifier, directive string, preferredStrategy string) Schema {
 	return &paramVerifyingSchema{
-		schema:    s,
-		verifier:  verifier,
-		directive: directive,
+		schema:            s,
+		verifier:          verifier,
+		directive:         directive,
+		preferredStrategy: preferredStrategy,
 	}
 }
 
@@ -119,9 +127,10 @@ func NewParamVerifyingSchema(s Schema, verifier resource.Verifier, directive str
 // server-side validation will be performed instead
 // of client-side validation.
 type paramVerifyingSchema struct {
-	schema    Schema
-	verifier  resource.Verifier
-	directive string
+	schema            Schema
+	verifier          resource.Verifier
+	directive         string
+	preferredStrategy string
 }
 
 // ValidateBytes validates bytes per a ParamVerifyingSchema
@@ -137,7 +146,7 @@ func (c *paramVerifyingSchema) ValidateBytes(data []byte) error {
 	}
 
 	err = c.verifier.HasSupport(gvk)
-	if resource.IsParamUnsupportedError(err) {
+	if c.preferredStrategy == ValidationStrategyClient || resource.IsParamUnsupportedError(err) {
 		switch c.directive {
 		case metav1.FieldValidationStrict:
 			return c.schema.ValidateBytes(data)

@@ -197,7 +197,7 @@ func (o *ReplaceOptions) Complete(f cmdutil.Factory, cmd *cobra.Command, args []
 		return err
 	}
 
-	schema, err := f.Validator(o.validationDirective)
+	schema, err := f.Validator(o.validationDirective, validation.ValidationStrategyServer)
 	if err != nil {
 		return err
 	}

@@ -143,7 +143,7 @@ func (f *factoryImpl) UnstructuredClientForMapping(mapping *meta.RESTMapping) (r
 	return restclient.RESTClientFor(cfg)
 }
 
-func (f *factoryImpl) Validator(validationDirective string) (validation.Schema, error) {
+func (f *factoryImpl) Validator(validationDirective string, preferredStrategy string) (validation.Schema, error) {
 	// client-side schema validation is only performed
 	// when the validationDirective is strict.
 	// If the directive is warn, we rely on the ParamVerifyingSchema
@@ -175,7 +175,7 @@ func (f *factoryImpl) Validator(validationDirective string) (validation.Schema, 
 	primary := resource.NewQueryParamVerifierV3(dynamicClient, oapiV3Client, queryParam)
 	secondary := resource.NewQueryParamVerifier(dynamicClient, f.openAPIGetter(), queryParam)
 	fallback := resource.NewFallbackQueryParamVerifier(primary, secondary)
-	return validation.NewParamVerifyingSchema(schema, fallback, string(validationDirective)), nil
+	return validation.NewParamVerifyingSchema(schema, fallback, string(validationDirective), string(preferredStrategy)), nil
 }
 
 // OpenAPISchema returns metadata and structural information about

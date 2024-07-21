@@ -249,7 +249,7 @@ func TestParamVerifyingSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			schema := NewParamVerifyingSchema(tt.schema, tt.verifier, tt.directive)
+			schema := NewParamVerifyingSchema(tt.schema, tt.verifier, tt.directive, ValidationStrategyServer)
 			err := schema.ValidateBytes(bytes)
 			if err != nil && tt.shouldPass {
 				t.Errorf("Unexpected error: %v in %s", err, tt.name)

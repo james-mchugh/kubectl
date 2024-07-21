@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	validation2 "k8s.io/kubectl/pkg/validation"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -316,7 +317,7 @@ func (o *EditOptions) Run() error {
 			klog.V(4).Infof("User edited:\n%s", string(edited))
 
 			// Apply validation
-			schema, err := o.f.Validator(o.ValidationDirective)
+			schema, err := o.f.Validator(o.ValidationDirective, validation2.ValidationStrategyServer)
 			if err != nil {
 				return preservedFile(err, file, o.ErrOut)
 			}

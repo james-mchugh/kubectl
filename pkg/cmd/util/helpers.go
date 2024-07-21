@@ -46,6 +46,7 @@ import (
 	"k8s.io/client-go/scale"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
+	"k8s.io/kubectl/pkg/validation"
 	utilexec "k8s.io/utils/exec"
 )
 
@@ -668,6 +669,19 @@ func GetValidationDirective(cmd *cobra.Command) (string, error) {
 		return metav1.FieldValidationStrict, nil
 	}
 	return metav1.FieldValidationIgnore, nil
+}
+
+func GetValidationStrategy(cmd *cobra.Command) (string, error) {
+	dryRunStrategy, err := GetDryRunStrategy(cmd)
+	if err != nil {
+		return "", err
+	}
+	switch dryRunStrategy {
+	case DryRunClient:
+		return validation.ValidationStrategyClient, nil
+	default:
+		return validation.ValidationStrategyServer, nil
+	}
 }
 
 type DryRunStrategy int

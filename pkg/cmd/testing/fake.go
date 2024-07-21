@@ -525,7 +525,7 @@ func (f *TestFactory) UnstructuredClientForMapping(mapping *meta.RESTMapping) (r
 }
 
 // Validator returns a validation schema
-func (f *TestFactory) Validator(validateDirective string) (validation.Schema, error) {
+func (f *TestFactory) Validator(validationDirective string, preferredStrategy string) (validation.Schema, error) {
 	return validation.NullSchema{}, nil
 }
 

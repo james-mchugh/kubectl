@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	validation2 "k8s.io/kubectl/pkg/validation"
 	"net/url"
 	"runtime"
 	"strings"
@@ -237,7 +238,7 @@ func (o *CreateOptions) RunCreate(f cmdutil.Factory, cmd *cobra.Command) error {
 		return RunEditOnCreate(f, o.PrintFlags, o.RecordFlags, o.IOStreams, cmd, &o.FilenameOptions, o.fieldManager)
 	}
 
-	schema, err := f.Validator(o.ValidationDirective)
+	schema, err := f.Validator(o.ValidationDirective, validation2.ValidationStrategyServer)
 	if err != nil {
 		return err
 	}
